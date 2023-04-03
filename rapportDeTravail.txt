@@ -1,2 +1,2 @@
 3 avril : 
-Le debut du tp, on prepare le workspace 
+Le debut du tp, on setup le workspace
