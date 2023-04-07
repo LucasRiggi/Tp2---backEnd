@@ -6,9 +6,7 @@ const placeSchema = new Schema({
     id:{},
     titre:{type: String, required: true},
     description: {type: String, required: true},
-    image: {type: String, required: true},
-    adresse: {type: String, required: true},
-    createur:{type: mongoose.Types.ObjectId, required: true, ref:"Utilisateur"}
+    professeur:{type: mongoose.Types.ObjectId, required: true, ref:"Professeur"}
 });
 
 module.exports = mongoose.model("Place", placeSchema);
