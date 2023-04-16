@@ -1,11 +1,11 @@
 const express = require("express");
 
-const controleursCours = require("../controllers/cours-controleurs");
+const controleursCours = require("../controllers/cours-controllers");
 const router = express.Router();
 
 router.get("/:coursId", controleursCours.getCoursById);
 
-router.get("/professeurs/:professeurId", controleursPlace.getPlacesByProfesseurId);
+router.get("/professeurs/:professeurId", controleursCours.getCoursByProfesseurId);
 
 router.post('/', controleursCours.creerCours);
 

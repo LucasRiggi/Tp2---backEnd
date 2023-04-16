@@ -23,7 +23,7 @@ const getCoursById = async (requete, reponse, next) => {
   reponse.json({ cours: cours.toObject({ getters: true }) });
 };
 
-const getCoursByUserId = async (requete, reponse, next) => {
+const getCoursByProfesseurId = async (requete, reponse, next) => {
   const professeurId = requete.params.professeurId;
 
   let cours;
@@ -32,8 +32,6 @@ const getCoursByUserId = async (requete, reponse, next) => {
 
     cours = professeur.cours;
     console.log(professeur);
-
-    //cours = await cours.find({ createur: professeurId });
   } catch (err) {
     return next(
       new HttpErreur(
@@ -65,7 +63,7 @@ const creerCours = async (requete, reponse, next) => {
   let professeur;
 
   try {
-    professeur = await Professeur.findById(createur);
+    professeur = await Professeur.findById(enseignant);
 
   } catch {
 
@@ -80,19 +78,72 @@ const creerCours = async (requete, reponse, next) => {
 
 
     await nouveauCours.save();
-    //Ce n'est pas le push Javascript, c'est le push de mongoose qui récupe le id de la cours et l'ajout au tableau de l'professeur
+    
     professeur.cours.push(nouveauCours);
     await professeur.save();
-    //Une transaction ne crée pas automatiquement de collection dans mongodb, même si on a un modèle
-    //Il faut la créer manuellement dans Atlas ou Compass
   } catch (err) {
     const erreur = new HttpErreur("Création de cours échouée", 500);
     return next(erreur);
   }
-  reponse.status(201).json({ cours: nouvellecours });
+  reponse.status(201).json({ cours: nouveauCours });
+};
+
+const updateCours = async (requete, reponse, next) => {
+  const { titre, description } = requete.body;
+  const coursId = requete.params.coursId;
+
+  let cours;
+
+  try {
+    cours = await cours.findById(coursId);
+    cours.titre = titre;
+    cours.description = description;
+    await cours.save();
+  } catch {
+    return next(
+      new HttpErreur("Erreur lors de la mise à jour de la cours", 500)
+    );
+  }
+
+  reponse.status(200).json({ cours: cours.toObject({ getters: true }) });
+};
+
+const supprimerCours = async (requete, reponse, next) => {
+  const coursId = requete.params.coursId;
+  let cours;
+  try {
+
+    cours = await cours.findById(coursId).populate("createur");
+
+  } catch {
+
+    return next(
+      new HttpErreur("Erreur lors de la suppression de le cours", 500)
+    );
+
+  }
+  if(!cours){
+    return next(new HttpErreur("Impossible de trouver le cours", 404));
+  }
+
+  try{
+
+    await cours.remove();
+    cours.professeur.cours.pull(cours);
+    await cours.createur.save()
+
+  }catch{
+    return next(
+      new HttpErreur("Erreur lors de la suppression de la cours", 500)
+    );
+  }
+  reponse.status(200).json({ message: "cours supprimée" });
 };
 
 
 
 exports.getCoursById = getCoursById;
-exports.getCoursByUserId = getCoursByUserId;
+exports.getCoursByProfesseurId = getCoursByProfesseurId;
+exports.creerCours = creerCours;
+exports.updateCours = updateCours;
+exports.supprimerCours = supprimerCours;
