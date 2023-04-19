@@ -96,7 +96,6 @@ const creerCours = async (requete, reponse, next) => {
 
     
     await nouveauCours.save();
-
     professeur.cours.push(nouveauCours);
     await professeur.save();
 
@@ -133,7 +132,7 @@ const supprimerCours = async (requete, reponse, next) => {
   try {
 
     cours = await Cours.findById(coursId).populate("professeur");
-
+    
   } catch {
 
     return next(
@@ -141,6 +140,7 @@ const supprimerCours = async (requete, reponse, next) => {
     );
 
   }
+
   if (!cours) {
     return next(new HttpErreur("Impossible de trouver le cours", 404));
   }

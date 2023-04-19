@@ -12,4 +12,4 @@ const etudiantSchema = new Schema({
 
 
 
-module.exports = mongoose.model("etudiant", etudiantSchema);
+module.exports = mongoose.model("Etudiant", etudiantSchema);

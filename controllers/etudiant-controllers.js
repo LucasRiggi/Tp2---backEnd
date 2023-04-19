@@ -73,6 +73,10 @@ const inscription = async (requete, reponse, next) => {
   
   try {
     await nouvelEtudiant.save();
+    nouvelEtudiant.cours.map(cour => 
+      cour.etudiants.push(nouvelEtudiant));
+    console.log("Lucas")
+    await nouvelEtudiant.cours;
   } catch (err) {
     console.log(err);
     return next(new HttpErreur("Erreur lors de l'ajout de l'etudiant", 422));
