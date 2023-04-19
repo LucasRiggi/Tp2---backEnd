@@ -13,17 +13,17 @@ const ETUDIANTS = [
 ];
 
 const getEtudiants = async (requete, reponse, next) => {
-  let Etudiant;
-  const etudiantId = requete.params.coursId;
+  let etudiant;
+
   try {
-    etudiant = await Etudiant.findById(etudiantId);
+    etudiant = await Etudiant.find({}, "-motDePasse");
   } catch {
     return next(new HttpErreur("Erreur accès etudiant"), 500);
   }
 
   reponse.json({
-    etudiants: etudiants.map(etudiants =>
-        etudiants.toObject({ getters: true })
+    etudiant: etudiant.map(etudiant =>
+        etudiant.toObject({ getters: true })
     ) });
 };
 

@@ -29,7 +29,7 @@ const getProfesseur = async (requete, reponse, next) => {
 };
 
 const inscription = async (requete, reponse, next) => {
-  const { nom, courriel, motDePasse } = requete.body;
+  const { nom, courriel, motDePasse, cours } = requete.body;
 
   let professeurExiste;
 
