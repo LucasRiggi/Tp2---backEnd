@@ -14,9 +14,9 @@ const ETUDIANTS = [
 
 const getEtudiants = async (requete, reponse, next) => {
   let Etudiant;
-
+  const etudiantId = requete.params.coursId;
   try {
-    etudiant = await Etudiant.find({}, "-motDePasse");
+    etudiant = await Etudiant.findById(etudiantId);
   } catch {
     return next(new HttpErreur("Erreur accès etudiant"), 500);
   }
@@ -28,7 +28,7 @@ const getEtudiants = async (requete, reponse, next) => {
 };
 
 const inscription = async (requete, reponse, next) => {
-  const { nom, courriel, motDePasse, image } = requete.body;
+  const { nom, courriel, motDePasse, cours} = requete.body;
 
   let etudiantExiste;
 
@@ -47,10 +47,10 @@ const inscription = async (requete, reponse, next) => {
   let nouvelEtudiant = new Etudiant({
     nom,
     courriel,
-    image,
     motDePasse,
-    cours: [],
+    cours
   });
+  
   try {
     await nouvelEtudiant.save();
   } catch (err) {

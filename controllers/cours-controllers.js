@@ -11,7 +11,7 @@ const getCoursById = async (requete, reponse, next) => {
   const coursId = requete.params.coursId;
   let cours;
   try {
-    cours = await cours.findById(coursId);
+    cours = await Cours.findById(coursId);
   } catch (err) {
     return next(
       new HttpErreur("Erreur lors de la récupération de la cours", 500)
@@ -28,7 +28,7 @@ const getCoursByProfesseurId = async (requete, reponse, next) => {
 
   let cours;
   try {
-    let professeur = await professeur.findById(professeurId).populate("cours");
+    let professeur = await Professeur.findById(professeurId).populate("cours");
 
     cours = professeur.cours;
     console.log(professeur);

@@ -3,7 +3,7 @@ const express = require("express");
 const controleursEtudiant = require("../controllers/etudiant-controllers")
 const router = express.Router();
 
-router.get('/', controleursEtudiant.getEtudiants);
+router.get('/:etudiantId', controleursEtudiant.getEtudiants);
 
 router.post('/inscription', controleursEtudiant.inscription);
 

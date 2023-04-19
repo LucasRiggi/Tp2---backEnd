@@ -9,6 +9,7 @@ const PROFESSEUR = [
     nom: "Sylvain Labranche",
     courriel: "slabranche@cmontmorency.qc.ca",
     motDePasse: "test",
+    cours:["web et bases de données"]
   }
 ];
 
@@ -16,7 +17,7 @@ const getProfesseur = async (requete, reponse, next) => {
   let professeur;
 
   try {
-    professeur = await PROFESSEUR.find({}, "-motDePasse");
+    professeur = await Professeur.find({}, "-motDePasse");
   } catch {
     return next(new HttpErreur("Erreur accès professeur"), 500);
   }
@@ -33,9 +34,9 @@ const inscription = async (requete, reponse, next) => {
   let professeurExiste;
 
   try {
-    professeurExiste = await PROFESSEUR.findOne({ courriel: courriel });
+    professeurExiste = await Professeur.findOne({ courriel: courriel });
   } catch {
-    return next(new HttpErreur("Échec vérification utilisateur existe", 500));
+    return next(new HttpErreur("Échec vérification du professeur existe", 500));
   }
 
   if (professeurExiste) {
@@ -47,7 +48,8 @@ const inscription = async (requete, reponse, next) => {
   const nouveauProfesseur = new Professeur({
     nom,
     courriel,
-    motDePasse
+    motDePasse,
+    cours
   });
   
   try {
@@ -67,7 +69,7 @@ const connexion = async (requete, reponse, next) => {
   let professeurExiste;
 
   try {
-    professeurExiste = await PROFESSEUR.findOne({ courriel: courriel });
+    professeurExiste = await Professeur.findOne({ courriel: courriel });
   } catch {
     return next(
       new HttpErreur("Connexion échouée, veuillez réessayer plus tard", 500)
