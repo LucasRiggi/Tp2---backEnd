@@ -7,7 +7,7 @@ const PROFESSEUR = [
   {
     id: "u1",
     nom: "Diego rigi",
-    courriel: "slabranche@cmontmorency.qc.ca",
+    courriel: "Drigi@cmontmorency.qc.ca",
     motDePasse: "test",
     cours:["web et bases de données"]
   }
@@ -48,7 +48,7 @@ const getProfesseur = async (requete, reponse, next) => {
 };
 
 const inscription = async (requete, reponse, next) => {
-  const { nom, courriel, motDePasse, cours } = requete.body;
+  const { nom, courriel, motDePasse } = requete.body;
 
   let professeurExiste;
 
@@ -68,7 +68,7 @@ const inscription = async (requete, reponse, next) => {
     nom,
     courriel,
     motDePasse,
-    cours
+    cours:[]
   });
   
   try {
