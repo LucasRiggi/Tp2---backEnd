@@ -7,7 +7,9 @@ router.get("/:coursId", controleursCours.getCoursById);
 
 router.get("/professeurs/:professeurId", controleursCours.getCoursByProfesseurId);
 
-router.post('/', controleursCours.creerCours);
+router.post('/creerCours', controleursCours.creerCours);
+
+router.get('/', controleursCours.getCours);
 
 router.patch('/:coursId', controleursCours.updateCours);
 

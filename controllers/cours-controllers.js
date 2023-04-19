@@ -31,7 +31,7 @@ const getCoursByProfesseurId = async (requete, reponse, next) => {
     let professeur = await Professeur.findById(professeurId).populate("cours");
 
     cours = professeur.cours;
-    console.log(professeur);
+    console.log(cours);
   } catch (err) {
     return next(
       new HttpErreur(
@@ -52,12 +52,30 @@ const getCoursByProfesseurId = async (requete, reponse, next) => {
   });
 };
 
+const getCours = async (requete, reponse, next) => {
+  let cours;
+
+  try {
+    cours = await Cours.find({}, "-motDePasse");
+  } catch {
+    return next(new HttpErreur("Erreur accès etudiant"), 500);
+  }
+
+  reponse.json({
+    cours: cours.map(cour =>
+      cour.toObject({ getters: true })
+    )
+  });
+
+}
+
 const creerCours = async (requete, reponse, next) => {
-  const { titre, description, enseignant } = requete.body;
+  const { titre, description, enseignant, etudiants } = requete.body;
   const nouveauCours = new Cours({
     titre,
     description,
-    enseignant
+    enseignant,
+    etudiants
   });
 
   let professeur;
@@ -78,7 +96,7 @@ const creerCours = async (requete, reponse, next) => {
 
 
     await nouveauCours.save();
-    
+
     professeur.cours.push(nouveauCours);
     await professeur.save();
   } catch (err) {
@@ -95,7 +113,7 @@ const updateCours = async (requete, reponse, next) => {
   let cours;
 
   try {
-    cours = await cours.findById(coursId);
+    cours = await Cours.findById(coursId);
     cours.titre = titre;
     cours.description = description;
     await cours.save();
@@ -113,7 +131,7 @@ const supprimerCours = async (requete, reponse, next) => {
   let cours;
   try {
 
-    cours = await cours.findById(coursId).populate("createur");
+    cours = await Cours.findById(coursId).populate("professeur");
 
   } catch {
 
@@ -122,17 +140,20 @@ const supprimerCours = async (requete, reponse, next) => {
     );
 
   }
-  if(!cours){
+  if (!cours) {
     return next(new HttpErreur("Impossible de trouver le cours", 404));
   }
 
-  try{
-
+  try {
+    console.log("Chems")
     await cours.remove();
+    console.log("Lucas the Lucas")
     cours.professeur.cours.pull(cours);
-    await cours.createur.save()
+    cours.etudiants.map(etudiant => 
+      etudiant.cours.pull(cours))
+    await cours.professeur.save()
 
-  }catch{
+  } catch {
     return next(
       new HttpErreur("Erreur lors de la suppression de la cours", 500)
     );
@@ -141,7 +162,7 @@ const supprimerCours = async (requete, reponse, next) => {
 };
 
 
-
+exports.getCours = getCours;
 exports.getCoursById = getCoursById;
 exports.getCoursByProfesseurId = getCoursByProfesseurId;
 exports.creerCours = creerCours;

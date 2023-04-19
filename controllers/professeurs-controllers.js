@@ -6,12 +6,31 @@ const Professeur = require("../models/professeurs");
 const PROFESSEUR = [
   {
     id: "u1",
-    nom: "Sylvain Labranche",
+    nom: "Diego rigi",
     courriel: "slabranche@cmontmorency.qc.ca",
     motDePasse: "test",
     cours:["web et bases de données"]
   }
 ];
+
+const getProfesseurParId = async (requete, reponse, next) => {
+  const professeurId = requete.params.professeurId;
+
+  let professeur;
+  try {
+    professeur = await Etudiant.findById(professeurId);
+  } catch (err) {
+    return next(
+      new HttpErreur("Erreur lors de la récupération du professeur", 500)
+    );
+  }
+  if (!professeur) {
+    return next(new HttpErreur("Aucun professeur trouvée pour l'id fourni", 404));
+  }
+  reponse.json({ professeur: professeur.toObject({ getters: true }) });
+
+
+}
 
 const getProfesseur = async (requete, reponse, next) => {
   let professeur;
@@ -83,6 +102,66 @@ const connexion = async (requete, reponse, next) => {
   reponse.json({ message: "connexion réussie!" });
 };
 
+const updateProf = async (requete, reponse, next) => {
+  const { nom, courriel, motDePasse,  cours} = requete.body;
+  const professeurId= requete.params.professeurId;
+
+  let professeur;
+
+  try {
+    professeur = await Professeur.findById(professeurId);
+    professeur.nom = nom;
+    professeur.courriel = courriel;
+    professeur.motDePasse = motDePasse;
+    professeur.cours = cours;
+    await professeur.save();
+  } catch {
+    return next(
+      new HttpErreur("Erreur lors de la mise à jour du cours", 500)
+    );
+  }
+
+  reponse.status(200).json({ professeur: professeur.toObject({ getters: true }) });
+};
+
+const supprimerProfesseur = async (requete, reponse, next) => {
+  const professeurId = requete.params.professeurId;
+  let professeur;
+  try {
+
+    professeur = await Professeur.findById(professeurId);
+    console.log("Good ");
+  } catch {
+
+    return next(
+      new HttpErreur("Erreur lors de la suppression du professeur", 500)
+    );
+
+  }
+  if (!professeur) {
+    return next(new HttpErreur("Impossible de trouver le professeur", 404));
+  }
+
+  try {
+    console.log("Good 2");
+    await professeur.remove();
+    console.log("Good 3")
+    professeur.cours.map(cour => 
+      cour.professeur.pull(professeur));
+    await professeur.cours.save()
+    console.log("Good 4")
+
+  } catch {
+    return next(
+      new HttpErreur("Erreur lors de la suppression du professeur", 500)
+    );
+  }
+  reponse.status(200).json({ message: "cours supprimée" });
+};
+
 exports.getProfesseur = getProfesseur;
 exports.inscription = inscription;
 exports.connexion = connexion;
+exports.getProfesseurParId = getProfesseurParId;updateProf
+exports.updateProf = updateProf;
+exports.supprimerProfesseur = supprimerProfesseur;

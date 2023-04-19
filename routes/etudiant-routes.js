@@ -9,4 +9,10 @@ router.post('/inscription', controleursEtudiant.inscription);
 
 router.post('/connexion', controleursEtudiant.connexion);
 
+router.post('/:etudiantId', controleursEtudiant.getEtudiantParId);
+
+router.patch('/:etudiantId', controleursEtudiant.updateEtudiant);
+
+router.delete('/:etudiantId', controleursEtudiant.supprimerEtudiant);
+
 module.exports = router;

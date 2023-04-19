@@ -6,9 +6,9 @@ const Etudiant = require("../models/etudiant");
 const ETUDIANTS = [
   {
     id: "u1",
-    nom: "Sylvain Labranche",
-    courriel: "slabranche@cmontmorency.qc.ca",
-    motDePasse: "test",
+    nom: "Lucas Ranon",
+    courriel: "Ranon@cmontmorency.qc.ca",
+    motDePasse: "test"
   },
 ];
 
@@ -19,6 +19,7 @@ const getEtudiants = async (requete, reponse, next) => {
     etudiant = await Etudiant.find({}, "-motDePasse");
   } catch {
     return next(new HttpErreur("Erreur accès etudiant"), 500);
+
   }
 
   reponse.json({
@@ -26,6 +27,25 @@ const getEtudiants = async (requete, reponse, next) => {
         etudiant.toObject({ getters: true })
     ) });
 };
+
+const getEtudiantParId = async (requete, reponse, next) => {
+  const etudiantId = requete.params.etudiantId;
+
+  let etudiant;
+  try {
+    etudiant = await Etudiant.findById(etudiantId);
+  } catch (err) {
+    return next(
+      new HttpErreur("Erreur lors de la récupération de l'étudiant", 500)
+    );
+  }
+  if (!etudiant) {
+    return next(new HttpErreur("Aucun étudiant trouvée pour l'id fourni", 404));
+  }
+  reponse.json({ etudiant: etudiant.toObject({ getters: true }) });
+
+
+}
 
 const inscription = async (requete, reponse, next) => {
   const { nom, courriel, motDePasse, cours} = requete.body;
@@ -82,6 +102,67 @@ const connexion = async (requete, reponse, next) => {
   reponse.json({ message: "connexion réussie!" });
 };
 
+const updateEtudiant = async (requete, reponse, next) => {
+  const { titre, description, courriel, motDePasse, cours} = requete.body;
+  const etudiantId = requete.params.etudiantId;
+
+  let etudiant;
+
+  try {
+    etudiant = await Etudiant.findById(etudiantId);
+    etudiant.titre = titre;
+    etudiant.description = description;
+    etudiant.courriel = courriel;
+    etudiant.motDePasse = motDePasse;
+    etudiant.cours = cours;
+    await etudiant.save();
+  } catch {
+    return next(
+      new HttpErreur("Erreur lors de la mise à jour de la cours", 500)
+    );
+  }
+
+  reponse.status(200).json({ etudiant: etudiant.toObject({ getters: true }) });
+};
+
+const supprimerEtudiant = async (requete, reponse, next) => {
+  const etudiantId = requete.params.coursId;
+  let etudiant;
+  try {
+
+    etudiant = await Etudiant.findById(etudiantId);
+
+  } catch {
+
+    return next(
+      new HttpErreur("Erreur lors de la suppression de le cours", 500)
+    );
+
+  }
+  if (!etudiant) {
+    return next(new HttpErreur("Impossible de trouver le cours", 404));
+  }
+
+  try {
+
+    await etudiant.remove();
+    etudiant.cours.map(cour => 
+      cour.etudiants.pull(etudiant));
+    await etudiant.cours.save()
+
+  } catch {
+    return next(
+      new HttpErreur("Erreur lors de la suppression de la cours", 500)
+    );
+  }
+  reponse.status(200).json({ message: "cours supprimée" });
+};
+
+
+
 exports.getEtudiants = getEtudiants;
 exports.inscription = inscription;
 exports.connexion = connexion;
+exports.getEtudiantParId = getEtudiantParId;
+exports.updateEtudiant = updateEtudiant;
+exports.supprimerEtudiant = supprimerEtudiant;
