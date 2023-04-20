@@ -145,11 +145,6 @@ const supprimerProfesseur = async (requete, reponse, next) => {
   try {
     console.log("Good 2");
     await professeur.remove();
-    console.log("Good 3")
-    professeur.cours.map(cour => 
-      cour.professeur.pull(professeur));
-    await professeur.cours.save()
-    console.log("Good 4")
 
   } catch {
     return next(
