@@ -131,12 +131,12 @@ const supprimerCours = async (requete, reponse, next) => {
   let cours;
   try {
 
-    cours = await Cours.findById(coursId).populate("professeur");
+    cours = await Cours.findById(coursId).populate("enseignant");
     
   } catch {
 
     return next(
-      new HttpErreur("Erreur lors de la suppression de le cours", 500)
+      new HttpErreur("Impossible de trouver le cours.", 500)
     );
 
   }
@@ -145,18 +145,20 @@ const supprimerCours = async (requete, reponse, next) => {
     return next(new HttpErreur("Impossible de trouver le cours", 404));
   }
 
+ 
+
   try {
-    console.log("Chems")
-    await cours.remove();
-    console.log("Lucas the Lucas")
-    cours.professeur.cours.pull(cours);
-    cours.etudiants.map(etudiant =>
-      etudiant.cours.pull(cours))
-    await cours.professeur.save()
+
+    await cours.deleteOne();
+
+    cours.enseignant.cours.pull(cours);
+
+    await cours.enseignant.save();
+
 
   } catch {
     return next(
-      new HttpErreur("Erreur lors de la suppression de la cours", 500)
+      new HttpErreur("Erreur lors de la suppression du cours", 500)
     );
   }
   reponse.status(200).json({ message: "cours supprimée" });

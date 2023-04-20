@@ -2,6 +2,7 @@ const { v4: uuidv4 } = require("uuid");
 const HttpErreur = require("../models/http-erreur");
 
 const Etudiant = require("../models/etudiant");
+const Cours = require("../models/cours");
 
 const ETUDIANTS = [
   {
@@ -24,8 +25,9 @@ const getEtudiants = async (requete, reponse, next) => {
 
   reponse.json({
     etudiant: etudiant.map(etudiant =>
-        etudiant.toObject({ getters: true })
-    ) });
+      etudiant.toObject({ getters: true })
+    )
+  });
 };
 
 const getEtudiantParId = async (requete, reponse, next) => {
@@ -48,7 +50,7 @@ const getEtudiantParId = async (requete, reponse, next) => {
 }
 
 const inscription = async (requete, reponse, next) => {
-  const { nom, courriel, motDePasse, cours} = requete.body;
+  const { nom, courriel, motDePasse } = requete.body;
 
   let etudiantExiste;
 
@@ -68,15 +70,13 @@ const inscription = async (requete, reponse, next) => {
     nom,
     courriel,
     motDePasse,
-    cours
+    cours: []
   });
-  
+
   try {
     await nouvelEtudiant.save();
-    nouvelEtudiant.cours.map(cour => 
-      cour.etudiants.push(nouvelEtudiant));
-    console.log("Lucas")
-    await nouvelEtudiant.cours;
+
+
   } catch (err) {
     console.log(err);
     return next(new HttpErreur("Erreur lors de l'ajout de l'etudiant", 422));
@@ -107,18 +107,15 @@ const connexion = async (requete, reponse, next) => {
 };
 
 const updateEtudiant = async (requete, reponse, next) => {
-  const { titre, description, courriel, motDePasse, cours} = requete.body;
+  const { courriel, motDePasse } = requete.body;
   const etudiantId = requete.params.etudiantId;
 
   let etudiant;
 
   try {
     etudiant = await Etudiant.findById(etudiantId);
-    etudiant.titre = titre;
-    etudiant.description = description;
     etudiant.courriel = courriel;
     etudiant.motDePasse = motDePasse;
-    etudiant.cours = cours;
     await etudiant.save();
   } catch {
     return next(
@@ -130,37 +127,71 @@ const updateEtudiant = async (requete, reponse, next) => {
 };
 
 const supprimerEtudiant = async (requete, reponse, next) => {
-  const etudiantId = requete.params.coursId;
+  const etudiantId = requete.params.etudiantId;
   let etudiant;
   try {
 
-    etudiant = await Etudiant.findById(etudiantId);
+    etudiant = await Etudiant.findById(etudiantId).populate("cours");
 
   } catch {
 
     return next(
-      new HttpErreur("Erreur lors de la suppression de le cours", 500)
+      new HttpErreur("Erreur lors de la suppression l'étudiant", 500)
     );
 
   }
   if (!etudiant) {
-    return next(new HttpErreur("Impossible de trouver le cours", 404));
+    return next(new HttpErreur("Impossible de trouver l'étudiant'", 404));
   }
 
   try {
-
-    await etudiant.remove();
-    etudiant.cours.map(cour => 
-      cour.etudiants.pull(etudiant));
-    await etudiant.cours.save()
+    await etudiant.deleteOne();
 
   } catch {
     return next(
-      new HttpErreur("Erreur lors de la suppression de la cours", 500)
+      new HttpErreur("Erreur lors de la suppression de l'étudiant", 500)
     );
   }
-  reponse.status(200).json({ message: "cours supprimée" });
+  reponse.status(200).json({ message: "Étudiant supprimée" });
 };
+
+const inscriptionCours = async (requete, reponse, next) => {
+  const { courriel, cours } = requete.body;
+  let etudiant, coursChoisi;
+
+  try {
+    etudiant = await Etudiant.findOne({courriel});
+    coursChoisi = await Cours.findById(cours);
+  } catch {
+    return next(new HttpErreur("Échec vérification de l'étudiant", 500));
+  }
+
+
+  if (!etudiant || !coursChoisi) {
+    return next(
+      new HttpErreur("L'étudiant ou le cours n'existe pas.", 422)
+    );
+  }
+  try {
+
+    etudiant.cours.push(cours);
+    await etudiant.save();
+    coursChoisi.etudiants.push(etudiant);
+    await coursChoisi.save();
+
+  } catch {
+    return next(
+      new HttpErreur("Erreur lors de l'ajout de l'étudiant au cours", 500)
+    );
+  }
+
+
+
+
+  reponse.status(200).json({ message: etudiant.nom +" ajouté au cours "+coursChoisi.titre});
+  };
+
+
 
 
 
@@ -170,3 +201,4 @@ exports.connexion = connexion;
 exports.getEtudiantParId = getEtudiantParId;
 exports.updateEtudiant = updateEtudiant;
 exports.supprimerEtudiant = supprimerEtudiant;
+exports.inscriptionCours = inscriptionCours;

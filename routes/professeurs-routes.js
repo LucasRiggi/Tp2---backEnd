@@ -5,6 +5,8 @@ const router = express.Router();
 
 router.get('/', controleursProfesseur.getProfesseur);
 
+router.get('/:professeurId', controleursProfesseur.getProfesseurParId);
+
 router.post('/inscription', controleursProfesseur.inscription);
 
 router.post('/connexion', controleursProfesseur.connexion);

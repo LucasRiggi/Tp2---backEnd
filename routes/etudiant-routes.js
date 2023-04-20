@@ -7,9 +7,11 @@ router.get('/', controleursEtudiant.getEtudiants);
 
 router.post('/inscription', controleursEtudiant.inscription);
 
+router.post('/inscriptionCours', controleursEtudiant.inscriptionCours)
+
 router.post('/connexion', controleursEtudiant.connexion);
 
-router.post('/:etudiantId', controleursEtudiant.getEtudiantParId);
+router.get('/:etudiantId', controleursEtudiant.getEtudiantParId);
 
 router.patch('/:etudiantId', controleursEtudiant.updateEtudiant);
 

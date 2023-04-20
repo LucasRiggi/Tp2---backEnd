@@ -1,2 +1,28 @@
-3 avril : 
-Le debut du tp, on setup le workspace
+Rapport tp2 : Lucas, Chems-Eddine, Diego
+
+1: Liste des fonctionalitées 
+
+      1. Ajouter un professeur avec  un cours d'étudiants vide et c'est le seul professeur au cours, à l'aide d'une requete POST 
+      2. Ajouter un étudiant avec un tableau de cours vide a l'aide d'une requete PSOT
+      3. Ajouter un cours a l'aide d'une requete POST
+      4. Modifier un etudiant, un cours et un professeur a l'aide d'une requete PATCH
+      5. Suprimer un etudiant, un cours et un professeur a l'aide d'une requete DELETE
+      6. Acceder a un etudiant, un cours et un professeur avec le id a l'aide d'une requete get
+      7. Ajouter un cours à un professeur avec la requete POST
+      8. Ajouter un étudiant à un cours avec la requete POST
+
+2: 
+   fait:
+      Ajouter un professeur avec  un cours d'étudiants vide et c'est le seul professeur au cours, à l'aide d'une requete POST 
+      Ajouter un étudiant avec un tableau de cours vide a l'aide d'une requete PSOT
+      Ajouter un cours a l'aide d'une requete POST
+      Modifier un etudiant, un cours et un professeur a l'aide d'une requete PATCH
+      Suprimer un etudiant, un cours et un professeur a l'aide d'une requete DELETE
+      Acceder a un etudiant, un cours et un professeur avec le id a l'aide d'une requete get
+      Ajouter un cours à un professeur avec la requete POST
+      Ajouter un étudiant à un cours avec la requete POST
+   non fait:
+      1. quand on efface un etudiant son id est encore dans le cours, vu que il faut passer par chaque cours et enlever l'étudiant dans la variable de l'objet cours. 
+      On a essayé d'utiliser la méthode map mais ça nous donnait une erreur et vu qu'on manquait de temps, nous n'avons pas essayé plus.
+      2. quand on efface un cours le cours est encore dans la liste du professeur
+      
